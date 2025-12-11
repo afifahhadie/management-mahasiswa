@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Data Mahasiswa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Manajemen Data Mahasiswa</h1>
+                    <p class="subtitle">Aplikasi untuk mengelola data mahasiswa dengan berbagai fitur CRUD, pencarian, dan pengurutan</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <!-- Sidebar untuk Form Input -->
+            <aside class="sidebar">
+                <div class="sidebar-content">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-user-plus"></i> Form Data Mahasiswa
+                        </h2>
+                        
+                        <form id="mahasiswaForm" class="mahasiswa-form">
+                            <div class="form-group">
+                                <label for="nim" class="form-label">
+                                    <i class="fas fa-id-card"></i> NIM:
+                                </label>
+                                <input type="text" id="nim" class="form-input" placeholder="Contoh: 241011400174" required>
+                                <div class="error-message" id="nimError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="nama" class="form-label">
+                                    <i class="fas fa-user"></i> Nama:
+                                </label>
+                                <input type="text" id="nama" class="form-input" placeholder="Masukkan nama lengkap" required>
+                                <div class="error-message" id="namaError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="jurusan" class="form-label">
+                                    <i class="fas fa-book"></i> Jurusan:
+                                </label>
+                                <select id="jurusan" class="form-select" required>
+                                    <option value="">Pilih Jurusan</option>
+                                    <option value="Teknik Informatika">Teknik Informatika</option>
+                                    <option value="Sistem Informasi">Sistem Informasi</option>
+                                    <option value="Teknik Komputer">Teknik Komputer</option>
+                                    <option value="Teknik Elektro">Teknik Elektro</option>
+                                </select>
+                                <div class="error-message" id="jurusanError"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="semester" class="form-label">
+                                    <i class="fas fa-layer-group"></i> Semester:
+                                </label>
+                                <input type="number" id="semester" class="form-input" min="1" max="14" placeholder="1-14" required>
+                                <div class="error-message" id="semesterError"></div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <div class="action-buttons">
+                                    <button type="submit" id="submitBtn" class="btn btn-primary btn-full">
+                                        <i class="fas fa-plus"></i> Tambah Data
+                                    </button>
+                                    <button type="button" id="updateBtn" class="btn btn-success btn-full" style="display: none;">
+                                        <i class="fas fa-save"></i> Update Data
+                                    </button>
+                                </div>
+                                <div class="action-buttons">
+                                    <button type="button" id="cancelBtn" class="btn btn-warning btn-full" style="display: none;">
+                                        <i class="fas fa-times"></i> Batal
+                                    </button>
+                                    <button type="button" id="resetBtn" class="btn btn-secondary btn-full">
+                                        <i class="fas fa-redo"></i> Reset Form
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="file-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-file-export"></i> Operasi File
+                        </h2>
+                        <div class="file-actions">
+                            <button id="exportBtn" class="btn btn-info btn-full">
+                                <i class="fas fa-download"></i> Ekspor ke File
+                            </button>
+                            <label for="importFile" class="btn btn-secondary btn-full">
+                                <i class="fas fa-upload"></i> Impor dari File
+                                <input type="file" id="importFile" accept=".json,.txt" hidden>
+                            </label>
+                            <button id="loadSampleBtn" class="btn btn-primary btn-full">
+                                <i class="fas fa-database"></i> Load Data Sample
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-info-circle"></i> Informasi
+                        </h2>
+                        <div class="info-content">
+                            <p><i class="fas fa-check-circle"></i> Data tersimpan di localStorage</p>
+                            <p><i class="fas fa-search"></i> Multiple search algorithms</p>
+                            <p><i class="fas fa-sort"></i> Multiple sorting algorithms</p>
+                            <p><i class="fas fa-shield-alt"></i> Validasi input dengan Regex</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Search Controls -->
+                <div class="search-section card">
+                    <h2 class="section-title">
+                        <i class="fas fa-search"></i> Pencarian Data
+                    </h2>
+                    <div class="search-controls">
+                        <div class="search-input-group">
+                            <div class="input-with-icon">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" class="form-input" placeholder="Cari berdasarkan NIM atau Nama...">
+                            </div>
+                            <div class="search-options">
+                                <div class="option-group">
+                                    <label for="searchType" class="option-label">Algoritma:</label>
+                                    <select id="searchType" class="form-select">
+                                        <option value="linear">Linear Search</option>
+                                        <option value="binary">Binary Search</option>
+                                        <option value="sequential">Sequential Search</option>
+                                    </select>
+                                </div>
+                                <div class="search-buttons">
+                                    <button id="searchBtn" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Cari
+                                    </button>
+                                    <button id="clearSearchBtn" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sort Controls -->
+                <div class="sort-section card">
+                    <h2 class="section-title">
+                        <i class="fas fa-sort-amount-down"></i> Pengurutan Data
+                    </h2>
+                    <div class="sort-controls">
+                        <div class="sort-options">
+                            <div class="option-group">
+                                <label for="sortType" class="option-label">Kriteria:</label>
+                                <select id="sortType" class="form-select">
+                                    <option value="nim">NIM (Ascending)</option>
+                                    <option value="nama">Nama (Ascending)</option>
+                                    <option value="semester">Semester (Ascending)</option>
+                                    <option value="nimDesc">NIM (Descending)</option>
+                                </select>
+                            </div>
+                            <div class="option-group">
+                                <label for="sortAlgorithm" class="option-label">Algoritma:</label>
+                                <select id="sortAlgorithm" class="form-select">
+                                    <option value="bubble">Bubble Sort</option>
+                                    <option value="selection">Selection Sort</option>
+                                    <option value="insertion">Insertion Sort</option>
+                                    <option value="shell">Shell Sort</option>
+                                    <option value="merge">Merge Sort</option>
+                                </select>
+                            </div>
+                            <button id="sortBtn" class="btn btn-primary">
+                                <i class="fas fa-sort-amount-down"></i> Urutkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-title">Total Mahasiswa</h3>
+                                <p class="stat-value" id="totalMahasiswa">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-sort-numeric-down"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-title">NIM Terkecil</h3>
+                                <p class="stat-value nim-value" id="nimTerkecil">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-sort-numeric-up"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-title">NIM Terbesar</h3>
+                                <p class="stat-value nim-value" id="nimTerbesar">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-title">Rata-rata Semester</h3>
+                                <p class="stat-value" id="rataSemester">0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="table-section card">
+                    <div class="table-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-list"></i> Daftar Mahasiswa
+                        </h2>
+                        <div class="table-info">
+                            <span id="tableInfo">Menampilkan 0 data mahasiswa</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table id="mahasiswaTable">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>NIM</th>
+                                        <th>Nama</th>
+                                        <th>Jurusan</th>
+                                        <th>Semester</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <!-- Data akan dimuat oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complexity Info -->
+                <div class="complexity-section card">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i> Estimasi Time Complexity
+                    </h2>
+                    <div class="complexity-grid">
+                        <div class="complexity-card">
+                            <div class="complexity-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3 class="complexity-title">Linear Search</h3>
+                            <div class="complexity-value">O(n)</div>
+                            <p class="complexity-desc">Pencarian dengan mengecek setiap elemen satu per satu</p>
+                        </div>
+                        
+                        <div class="complexity-card">
+                            <div class="complexity-icon">
+                                <i class="fas fa-search-plus"></i>
+                            </div>
+                            <h3 class="complexity-title">Binary Search</h3>
+                            <div class="complexity-value">O(log n)</div>
+                            <p class="complexity-desc">Pencarian pada data terurut, membagi data menjadi dua bagian</p>
+                        </div>
+                        
+                        <div class="complexity-card">
+                            <div class="complexity-icon">
+                                <i class="fas fa-sort"></i>
+                            </div>
+                            <h3 class="complexity-title">Bubble Sort</h3>
+                            <div class="complexity-value">O(n²)</div>
+                            <p class="complexity-desc">Mengurutkan dengan menukar elemen berturut-turut</p>
+                        </div>
+                        
+                        <div class="complexity-card">
+                            <div class="complexity-icon">
+                                <i class="fas fa-merge"></i>
+                            </div>
+                            <h3 class="complexity-title">Merge Sort</h3>
+                            <div class="complexity-value">O(n log n)</div>
+                            <p class="complexity-desc">Mengurutkan dengan membagi dan menggabungkan</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Modal untuk konfirmasi -->
+        <div id="confirmationModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="modal-title">Konfirmasi Penghapusan</h3>
+                <p class="modal-message" id="modalMessage">Apakah Anda yakin ingin menghapus data ini?</p>
+                <div class="modal-actions">
+                    <button id="confirmBtn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Ya, Hapus
+                    </button>
+                    <button id="cancelModalBtn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <p class="copyright">
+                    &copy; 2023 Aplikasi Manajemen Data Mahasiswa 
+                    <span class="separator">•</span>
+                    Dibuat untuk memenuhi tugas struktur data
+                </p>
+                <p class="tech-stack">
+                    <i class="fas fa-code"></i> HTML5, CSS3, JavaScript ES6+ 
+                    <span class="separator">•</span>
+                    <i class="fas fa-database"></i> LocalStorage 
+                    <span class="separator">•</span>
+                    <i class="fas fa-mobile-alt"></i> Responsive Design
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
